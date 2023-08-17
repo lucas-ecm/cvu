@@ -18,6 +18,8 @@ from cvu.utils.general import get_path
 from cvu.detector.yolov5.backends.common import download_weights
 from cvu.postprocess.nms.yolov5 import non_max_suppression_np
 
+from timeit import default_timer as timer
+
 
 class Yolov5(IModel):
     """Implements IModel for Yolov5 using ONNX.
@@ -122,8 +124,12 @@ class Yolov5(IModel):
         Returns:
             np.ndarray: inference's output after NMS
         """
+        start = timer()
         outputs = self._model.run([self._model.get_outputs()[0].name],
                                   {self._model.get_inputs()[0].name: inputs})
+        end = timer()
+        inf_time = end - start
+        print(f'Time: {inf_time}')
         return self._postprocess(outputs)[0]
 
     def __repr__(self) -> str:
